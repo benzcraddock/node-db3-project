@@ -38,9 +38,9 @@ const checkSchemeId = async (req, res, next) => {
 */
 const validateScheme = (req, res, next) => {
   if(
-    !req.body.scheme_name.trim() || 
     req.body.scheme_name === undefined || 
-    typeof req.body.scheme_name !== 'string'
+    typeof req.body.scheme_name !== 'string' || 
+    !req.body.scheme_name.trim()
     ){
       next({
         status: 400,
@@ -62,9 +62,9 @@ const validateScheme = (req, res, next) => {
 */
 const validateStep = (req, res, next) => {
   if(
-    !req.body.instructions.trim() || 
     req.body.instructions === undefined || 
     typeof req.body.instructions !== 'string' || 
+    !req.body.instructions.trim() || 
     typeof req.body.step_number !== 'number' || 
     isNaN(req.body.step_number) || 
     req.body.step_number < 1

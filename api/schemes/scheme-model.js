@@ -1,23 +1,29 @@
+const db = require('../../data/db-config')
+
 function find() { // EXERCISE A
   /*
     1A- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`.
     What happens if we change from a LEFT join to an INNER join?
 
-      SELECT
-          sc.*,
-          count(st.step_id) as number_of_steps
-      FROM schemes as sc
-      LEFT JOIN steps as st
-          ON sc.scheme_id = st.scheme_id
-      GROUP BY sc.scheme_id
-      ORDER BY sc.scheme_id ASC;
+    // SELECT sc.*, count(st.step_id) AS number_of_steps FROM schemes AS sc
+      // LEFT JOIN steps AS st ON sc.scheme_id = st.scheme_id
+      // GROUP BY sc.scheme_id
+      // ORDER BY sc.scheme_id ASC;
 
     2A- When you have a grasp on the query go ahead and build it in Knex.
     Return from this function the resulting dataset.
   */
+
+  return db('schemes as sc')
+    .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
+    .select('sc.*')
+    .count('st.step_id as number_of_steps')
+    .groupBy('sc.scheme_id')
+    .orderBy('sc.scheme_id asc')
 }
 
-function findById(scheme_id) { // EXERCISE B
+// MAKE THIS ASYNC!!!! have to pass in scheme_id
+async function findById(scheme_id) { // EXERCISE B
   /*
     1B- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`:
 
@@ -83,6 +89,35 @@ function findById(scheme_id) { // EXERCISE B
         "steps": []
       }
   */
+
+    // SELECT sc.scheme_name, st.* FROM schemes AS sc
+      // LEFT JOIN steps AS st ON sc.scheme_id = st.scheme_id
+      // WHERE sc.scheme_id = 1
+      // ORDER BY st.step_number ASC;
+
+  // 4A
+  const rows = await db('schemes as sc')
+    .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
+    .select('sc.scheme_name', 'st.*')
+    .where('sc.scheme_id', scheme_id)
+    .orderBy('st.step_number asc')
+
+  // 4B
+  const result = {
+    scheme_id: rows[0].scheme_id,
+    scheme_name: rows[0].scheme_name,
+    steps: []
+  }
+
+  rows.forEach(row => {
+    if(row.step_id) {
+      result.steps.push({
+        step_id: row.step_id,
+        step_number: row.step_number,
+        instructions: row.instructions
+      })
+    }
+  })
 }
 
 function findSteps(scheme_id) { // EXERCISE C
