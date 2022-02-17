@@ -19,7 +19,7 @@ function find() { // EXERCISE A
     .select('sc.*')
     .count('st.step_id as number_of_steps')
     .groupBy('sc.scheme_id')
-    .orderBy('sc.scheme_id asc')
+    .orderBy('sc.scheme_id')
 }
 
 // MAKE THIS ASYNC!!!! have to pass in scheme_id
@@ -100,7 +100,7 @@ async function findById(scheme_id) { // EXERCISE B
     .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
     .select('sc.scheme_name', 'st.*')
     .where('sc.scheme_id', scheme_id)
-    .orderBy('st.step_number asc')
+    .orderBy('st.step_number')
 
   // 4B
   const result = {
@@ -120,7 +120,8 @@ async function findById(scheme_id) { // EXERCISE B
   })
 }
 
-function findSteps(scheme_id) { // EXERCISE C
+// USE ASYNC BELOW!
+async function findSteps(scheme_id) { // EXERCISE C
   /*
     1C- Build a query in Knex that returns the following data.
     The steps should be sorted by step_number, and the array
@@ -141,6 +142,23 @@ function findSteps(scheme_id) { // EXERCISE C
         }
       ]
   */
+
+  // SELECT st.step_id, st.step_number, instructions, sc.scheme_name FROM schemes AS sc
+    // LEFT JOIN steps AS st
+    // ON sc.scheme_id = st.scheme_id
+    // WHERE sc.scheme_id = 1
+    // ORDER BY st.step_number ASC;
+  
+  const rows = db('schemes as sc')
+      .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
+      .select('st.step_id', 'st.step_number', 'instructions', 'sc.scheme_name')
+      .where('sc.scheme_id', scheme_id)
+      .orderBy('st.step_number')
+
+  if(!rows[0].step_id)
+  return []
+
+  return rows
 }
 
 function add(scheme) { // EXERCISE D
